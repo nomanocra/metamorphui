@@ -6,10 +6,14 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { SignOutButton } from "@/components/auth/signout-button"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { LanguageToggle } from "@/components/language-toggle"
+import { LanguageIndicator } from "@/components/language-indicator"
 import { prisma } from "@/lib/prisma"
+import { getTranslations } from 'next-intl/server'
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
+  const t = await getTranslations()
 
   if (!session?.user) {
     redirect("/signin")
@@ -37,8 +41,10 @@ export default async function DashboardPage() {
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">MetamorphUI</h1>
+          <h1 className="text-2xl font-bold">{t('dashboard.title')}</h1>
           <div className="flex items-center gap-4">
+            <LanguageToggle />
+            <LanguageIndicator />
             <ThemeToggle />
             <span className="text-sm text-muted-foreground">
               {session.user.email}
@@ -51,18 +57,18 @@ export default async function DashboardPage() {
       <main className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h2 className="text-3xl font-bold mb-2">Mes projets</h2>
+            <h2 className="text-3xl font-bold mb-2">{t('dashboard.myProjects')}</h2>
             <p className="text-muted-foreground">
-              Gérez vos projets Figma et vos tokens de design
+              {t('dashboard.description')}
             </p>
           </div>
           {projectCount < maxProjects ? (
             <Link href="/dashboard/projects/new">
-              <Button>Nouveau projet</Button>
+              <Button>{t('dashboard.newProject')}</Button>
             </Link>
           ) : (
             <Button disabled>
-              Limite atteinte ({maxProjects} projets max)
+              {t('dashboard.maxProjectsReached', { max: maxProjects })}
             </Button>
           )}
         </div>
@@ -70,14 +76,14 @@ export default async function DashboardPage() {
         {projects.length === 0 ? (
           <Card>
             <CardHeader>
-              <CardTitle>Aucun projet</CardTitle>
+              <CardTitle>{t('dashboard.noProjects.title')}</CardTitle>
               <CardDescription>
-                Créez votre premier projet pour commencer à importer vos tokens Figma
+                {t('dashboard.noProjects.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Link href="/dashboard/projects/new">
-                <Button>Créer un projet</Button>
+                <Button>{t('dashboard.noProjects.createButton')}</Button>
               </Link>
             </CardContent>
           </Card>
@@ -89,16 +95,19 @@ export default async function DashboardPage() {
                   <CardHeader>
                     <CardTitle>{project.name}</CardTitle>
                     <CardDescription>
-                      Fichier Figma: {project.figmaFileId}
+                      {t('dashboard.project.figmaFile', { fileId: project.figmaFileId })}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-muted-foreground">
-                        {project._count.tokens} token{project._count.tokens > 1 ? "s" : ""}
+                        {project._count.tokens === 1 
+                          ? t('dashboard.project.tokens', { count: project._count.tokens })
+                          : t('dashboard.project.tokensPlural', { count: project._count.tokens })
+                        }
                       </span>
                       <span className="text-xs text-muted-foreground">
-                        {new Date(project.createdAt).toLocaleDateString("fr-FR")}
+                        {new Date(project.createdAt).toLocaleDateString()}
                       </span>
                     </div>
                   </CardContent>

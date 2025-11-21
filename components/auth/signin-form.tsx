@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useTranslations } from 'next-intl'
 
 export function SignInForm() {
   const router = useRouter()
+  const t = useTranslations()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<React.ReactNode>("")
@@ -32,21 +34,21 @@ export function SignInForm() {
         if (result.error.includes("Email not verified")) {
           setError(
             <span>
-              Votre email n'a pas été vérifié.{" "}
+              {t('auth.signIn.error.emailNotVerified')}{" "}
               <Link href="/resend-verification" className="underline font-semibold">
-                Renvoyer le lien de vérification
+                {t('auth.signIn.error.resendVerification')}
               </Link>
             </span>
           )
         } else {
-          setError("Email ou mot de passe incorrect")
+          setError(t('auth.signIn.error.invalidCredentials'))
         }
       } else {
         router.push("/dashboard")
         router.refresh()
       }
     } catch (error) {
-      setError("Une erreur est survenue")
+      setError(t('auth.signIn.error.generic'))
     } finally {
       setIsLoading(false)
     }
@@ -64,15 +66,15 @@ export function SignInForm() {
       
       if (result?.error) {
         if (result.error === "Configuration") {
-          setError(`OAuth ${provider} n'est pas configuré. Veuillez configurer ${provider.toUpperCase()}_CLIENT_ID et ${provider.toUpperCase()}_CLIENT_SECRET dans le fichier .env`)
+          setError(t('auth.signIn.error.oauthNotConfigured', { provider }))
         } else {
-          setError(`Erreur lors de la connexion avec ${provider}: ${result.error}`)
+          setError(t('auth.signIn.error.oauthError', { provider, error: result.error }))
         }
         setIsLoading(false)
       }
     } catch (error) {
       console.error(`OAuth ${provider} error:`, error)
-      setError(`Une erreur est survenue lors de la connexion avec ${provider}. Vérifiez que les credentials OAuth sont configurés dans le fichier .env`)
+      setError(t('auth.signIn.error.oauthGeneric', { provider }))
       setIsLoading(false)
     }
   }
@@ -80,9 +82,9 @@ export function SignInForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Connexion</CardTitle>
+        <CardTitle>{t('auth.signIn.formTitle')}</CardTitle>
         <CardDescription>
-          Utilisez votre email ou connectez-vous avec un service externe
+          {t('auth.signIn.formDescription')}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
@@ -94,11 +96,11 @@ export function SignInForm() {
           )}
           
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('common.email')}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="vous@exemple.com"
+              placeholder={t('auth.signIn.emailPlaceholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -107,7 +109,7 @@ export function SignInForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Mot de passe</Label>
+            <Label htmlFor="password">{t('common.password')}</Label>
             <Input
               id="password"
               type="password"
@@ -119,7 +121,7 @@ export function SignInForm() {
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Connexion..." : "Se connecter"}
+            {isLoading ? t('auth.signIn.submitting') : t('auth.signIn.submit')}
           </Button>
         </CardContent>
       </form>
@@ -131,7 +133,7 @@ export function SignInForm() {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-card px-2 text-muted-foreground">
-              Ou continuer avec
+              {t('common.orContinueWith')}
             </span>
           </div>
         </div>

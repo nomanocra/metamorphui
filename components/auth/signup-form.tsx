@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useTranslations } from 'next-intl'
 
 export function SignUpForm() {
   const router = useRouter()
+  const t = useTranslations()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -45,12 +47,12 @@ export function SignUpForm() {
             <span>
               {data.error}{" "}
               <Link href={data.resendVerificationUrl} className="underline font-semibold">
-                Renvoyer le lien de vérification
+                {t('auth.signUp.error.resendVerification')}
               </Link>
             </span>
           )
         } else {
-          setError(data.error || "Une erreur est survenue")
+          setError(data.error || t('auth.signUp.error.generic'))
         }
         setIsLoading(false)
         return
@@ -71,13 +73,13 @@ export function SignUpForm() {
       })
 
       if (result?.error) {
-        setError("Compte créé mais erreur de connexion")
+        setError(t('auth.signUp.error.accountCreatedButSignInError'))
       } else {
         router.push("/dashboard")
         router.refresh()
       }
     } catch (error) {
-      setError("Une erreur est survenue lors de la création du compte")
+      setError(t('auth.signUp.error.accountCreationError'))
     } finally {
       setIsLoading(false)
     }
@@ -94,12 +96,12 @@ export function SignUpForm() {
       })
       
       if (result?.error) {
-        setError(`Erreur lors de la connexion avec ${provider}: ${result.error}`)
+        setError(t('auth.signUp.error.oauthError', { provider, error: result.error }))
         setIsLoading(false)
       }
     } catch (error) {
       console.error(`OAuth ${provider} error:`, error)
-      setError(`Une erreur est survenue lors de la connexion avec ${provider}. Vérifiez que les credentials OAuth sont configurés.`)
+      setError(t('auth.signUp.error.oauthGeneric', { provider }))
       setIsLoading(false)
     }
   }
@@ -107,9 +109,9 @@ export function SignUpForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Créer un compte</CardTitle>
+        <CardTitle>{t('auth.signUp.formTitle')}</CardTitle>
         <CardDescription>
-          Créez votre compte pour commencer à utiliser MetamorphUI
+          {t('auth.signUp.formDescription')}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
@@ -123,24 +125,23 @@ export function SignUpForm() {
           {showVerificationMessage && (
             <div className="p-4 text-sm bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md">
               <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                Email de vérification envoyé !
+                {t('auth.signUp.verificationMessage.title')}
               </h3>
               <p className="text-blue-800 dark:text-blue-200 mb-2">
-                Nous avons envoyé un email de vérification à <strong>{email}</strong>.
+                {t('auth.signUp.verificationMessage.sentTo', { email })}
               </p>
               <p className="text-blue-700 dark:text-blue-300 text-xs">
-                Veuillez cliquer sur le lien dans l'email pour activer votre compte. 
-                Le lien expirera dans 24 heures.
+                {t('auth.signUp.verificationMessage.instructions')}
               </p>
             </div>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="name">Nom</Label>
+            <Label htmlFor="name">{t('common.name')}</Label>
             <Input
               id="name"
               type="text"
-              placeholder="Votre nom"
+              placeholder={t('auth.signUp.namePlaceholder')}
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -149,11 +150,11 @@ export function SignUpForm() {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('common.email')}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="vous@exemple.com"
+              placeholder={t('auth.signUp.emailPlaceholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -162,7 +163,7 @@ export function SignUpForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Mot de passe</Label>
+            <Label htmlFor="password">{t('common.password')}</Label>
             <Input
               id="password"
               type="password"
@@ -173,12 +174,12 @@ export function SignUpForm() {
               disabled={isLoading}
             />
             <p className="text-xs text-muted-foreground">
-              Minimum 6 caractères
+              {t('auth.signUp.passwordMinLength')}
             </p>
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Création..." : "Créer un compte"}
+            {isLoading ? t('auth.signUp.submitting') : t('auth.signUp.submit')}
           </Button>
         </CardContent>
       </form>
@@ -190,7 +191,7 @@ export function SignUpForm() {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-card px-2 text-muted-foreground">
-              Ou continuer avec
+              {t('common.orContinueWith')}
             </span>
           </div>
         </div>

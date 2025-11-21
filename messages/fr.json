@@ -1,0 +1,151 @@
+{
+  "common": {
+    "welcome": "Bienvenue",
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire",
+    "signOut": "Se déconnecter",
+    "logout": "Déconnexion",
+    "back": "Retour",
+    "backToHome": "Retour à l'accueil",
+    "loading": "Chargement...",
+    "email": "Email",
+    "password": "Mot de passe",
+    "name": "Nom",
+    "createAccount": "Créer un compte",
+    "alreadyHaveAccount": "Déjà un compte ?",
+    "noAccount": "Pas encore de compte ?",
+    "orContinueWith": "Ou continuer avec",
+    "copyright": "© 2024 MetamorphUI. Tous droits réservés."
+  },
+  "home": {
+    "title": "MetamorphUI",
+    "signIn": "Se connecter",
+    "createAccount": "Créer un compte",
+    "hero": {
+      "title": "Transformez vos designs Figma en composants React",
+      "description": "Générez automatiquement des tokens de design et des composants React à partir de vos fichiers Figma. Exportez vos tokens en CSS et vos composants prêts pour la production.",
+      "startFree": "Commencer gratuitement",
+      "signInButton": "Se connecter"
+    },
+    "features": {
+      "designTokens": {
+        "title": "🎨 Tokens de Design",
+        "description": "Importez automatiquement tous vos tokens Figma (couleurs, typographie, espacements)",
+        "details": "Synchronisez vos variables Figma et exportez-les en CSS custom properties pour une intégration facile."
+      },
+      "reactComponents": {
+        "title": "⚛️ Composants React",
+        "description": "Générez des composants React à partir de vos composants Figma",
+        "details": "Transformez vos designs en composants React réutilisables et prêts pour la production."
+      },
+      "synchronization": {
+        "title": "🔄 Synchronisation",
+        "description": "Restez à jour avec vos designs Figma en un clic",
+        "details": "Synchronisez vos tokens et composants à tout moment pour refléter les dernières modifications de votre équipe design."
+      }
+    },
+    "cta": {
+      "title": "Prêt à commencer ?",
+      "description": "Créez votre compte gratuitement et connectez votre premier projet Figma",
+      "button": "Créer un compte gratuit"
+    }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Connexion",
+      "subtitle": "Connectez-vous à votre compte MetamorphUI",
+      "formTitle": "Connexion",
+      "formDescription": "Utilisez votre email ou connectez-vous avec un service externe",
+      "emailPlaceholder": "vous@exemple.com",
+      "passwordPlaceholder": "Votre mot de passe",
+      "submit": "Se connecter",
+      "submitting": "Connexion...",
+      "error": {
+        "invalidCredentials": "Email ou mot de passe incorrect",
+        "emailNotVerified": "Votre email n'a pas été vérifié.",
+        "resendVerification": "Renvoyer le lien de vérification",
+        "generic": "Une erreur est survenue",
+        "oauthNotConfigured": "OAuth {provider} n'est pas configuré. Veuillez configurer {provider}_CLIENT_ID et {provider}_CLIENT_SECRET dans le fichier .env",
+        "oauthError": "Erreur lors de la connexion avec {provider}: {error}",
+        "oauthGeneric": "Une erreur est survenue lors de la connexion avec {provider}. Vérifiez que les credentials OAuth sont configurés dans le fichier .env"
+      }
+    },
+    "signUp": {
+      "title": "Créer un compte",
+      "subtitle": "Commencez à transformer vos designs Figma",
+      "formTitle": "Créer un compte",
+      "formDescription": "Créez votre compte pour commencer à utiliser MetamorphUI",
+      "namePlaceholder": "Votre nom",
+      "emailPlaceholder": "vous@exemple.com",
+      "passwordPlaceholder": "Votre mot de passe",
+      "passwordMinLength": "Minimum 6 caractères",
+      "submit": "Créer un compte",
+      "submitting": "Création...",
+      "verificationMessage": {
+        "title": "Email de vérification envoyé !",
+        "sentTo": "Nous avons envoyé un email de vérification à {email}.",
+        "instructions": "Veuillez cliquer sur le lien dans l'email pour activer votre compte. Le lien expirera dans 24 heures."
+      },
+      "error": {
+        "generic": "Une erreur est survenue",
+        "accountCreationError": "Une erreur est survenue lors de la création du compte",
+        "accountCreatedButSignInError": "Compte créé mais erreur de connexion",
+        "resendVerification": "Renvoyer le lien de vérification",
+        "oauthError": "Erreur lors de la connexion avec {provider}: {error}",
+        "oauthGeneric": "Une erreur est survenue lors de la connexion avec {provider}. Vérifiez que les credentials OAuth sont configurés."
+      }
+    },
+    "verifyEmail": {
+      "loading": "Vérification en cours...",
+      "loadingDescription": "Veuillez patienter pendant que nous vérifions votre email",
+      "success": {
+        "title": "Email vérifié !",
+        "message": "Email vérifié avec succès",
+        "redirecting": "Redirection vers la page de connexion..."
+      },
+      "error": {
+        "title": "Erreur de vérification",
+        "missingToken": "Token de vérification manquant",
+        "verificationError": "Erreur lors de la vérification",
+        "generic": "Une erreur est survenue lors de la vérification",
+        "invalidOrExpired": "Le lien de vérification est invalide ou a expiré.",
+        "createNewAccount": "Créer un nouveau compte",
+        "signIn": "Se connecter"
+      }
+    },
+    "resendVerification": {
+      "title": "Renvoyer l'email de vérification",
+      "description": "Entrez votre adresse email pour recevoir un nouveau lien de vérification",
+      "emailPlaceholder": "vous@exemple.com",
+      "submit": "Renvoyer le lien de vérification",
+      "submitting": "Envoi en cours...",
+      "success": {
+        "message": "Un nouveau lien de vérification a été envoyé.",
+        "checkEmail": "Vérifiez votre boîte mail (et le dossier spam si nécessaire)."
+      },
+      "error": {
+        "generic": "Une erreur est survenue",
+        "sendError": "Une erreur est survenue lors de l'envoi du lien de vérification"
+      },
+      "backToSignIn": "Retour à la connexion",
+      "createNewAccount": "Créer un nouveau compte"
+    }
+  },
+  "dashboard": {
+    "title": "MetamorphUI",
+    "myProjects": "Mes projets",
+    "description": "Gérez vos projets Figma et vos tokens de design",
+    "newProject": "Nouveau projet",
+    "maxProjectsReached": "Limite atteinte ({max} projets max)",
+    "noProjects": {
+      "title": "Aucun projet",
+      "description": "Créez votre premier projet pour commencer à importer vos tokens Figma",
+      "createButton": "Créer un projet"
+    },
+    "project": {
+      "figmaFile": "Fichier Figma: {fileId}",
+      "tokens": "{count} token",
+      "tokensPlural": "{count} tokens"
+    }
+  }
+}

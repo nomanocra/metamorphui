@@ -1,0 +1,151 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signOut": "Sign out",
+    "logout": "Logout",
+    "back": "Back",
+    "backToHome": "Back to home",
+    "loading": "Loading...",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "createAccount": "Create account",
+    "alreadyHaveAccount": "Already have an account?",
+    "noAccount": "Don't have an account yet?",
+    "orContinueWith": "Or continue with",
+    "copyright": "© 2024 MetamorphUI. All rights reserved."
+  },
+  "home": {
+    "title": "MetamorphUI",
+    "signIn": "Sign in",
+    "createAccount": "Create account",
+    "hero": {
+      "title": "Transform your Figma designs into React components",
+      "description": "Automatically generate design tokens and React components from your Figma files. Export your tokens as CSS and production-ready components.",
+      "startFree": "Get started for free",
+      "signInButton": "Sign in"
+    },
+    "features": {
+      "designTokens": {
+        "title": "🎨 Design Tokens",
+        "description": "Automatically import all your Figma tokens (colors, typography, spacing)",
+        "details": "Sync your Figma variables and export them as CSS custom properties for easy integration."
+      },
+      "reactComponents": {
+        "title": "⚛️ React Components",
+        "description": "Generate React components from your Figma components",
+        "details": "Transform your designs into reusable, production-ready React components."
+      },
+      "synchronization": {
+        "title": "🔄 Synchronization",
+        "description": "Stay up to date with your Figma designs with one click",
+        "details": "Sync your tokens and components at any time to reflect the latest changes from your design team."
+      }
+    },
+    "cta": {
+      "title": "Ready to get started?",
+      "description": "Create your free account and connect your first Figma project",
+      "button": "Create free account"
+    }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Sign in",
+      "subtitle": "Sign in to your MetamorphUI account",
+      "formTitle": "Sign in",
+      "formDescription": "Use your email or sign in with an external service",
+      "emailPlaceholder": "you@example.com",
+      "passwordPlaceholder": "Your password",
+      "submit": "Sign in",
+      "submitting": "Signing in...",
+      "error": {
+        "invalidCredentials": "Invalid email or password",
+        "emailNotVerified": "Your email has not been verified.",
+        "resendVerification": "Resend verification link",
+        "generic": "An error occurred",
+        "oauthNotConfigured": "OAuth {provider} is not configured. Please configure {provider}_CLIENT_ID and {provider}_CLIENT_SECRET in the .env file",
+        "oauthError": "Error signing in with {provider}: {error}",
+        "oauthGeneric": "An error occurred while signing in with {provider}. Check that OAuth credentials are configured in the .env file"
+      }
+    },
+    "signUp": {
+      "title": "Create account",
+      "subtitle": "Start transforming your Figma designs",
+      "formTitle": "Create account",
+      "formDescription": "Create your account to start using MetamorphUI",
+      "namePlaceholder": "Your name",
+      "emailPlaceholder": "you@example.com",
+      "passwordPlaceholder": "Your password",
+      "passwordMinLength": "Minimum 6 characters",
+      "submit": "Create account",
+      "submitting": "Creating...",
+      "verificationMessage": {
+        "title": "Verification email sent!",
+        "sentTo": "We've sent a verification email to {email}.",
+        "instructions": "Please click the link in the email to activate your account. The link will expire in 24 hours."
+      },
+      "error": {
+        "generic": "An error occurred",
+        "accountCreationError": "An error occurred while creating the account",
+        "accountCreatedButSignInError": "Account created but sign in error",
+        "resendVerification": "Resend verification link",
+        "oauthError": "Error signing in with {provider}: {error}",
+        "oauthGeneric": "An error occurred while signing in with {provider}. Check that OAuth credentials are configured."
+      }
+    },
+    "verifyEmail": {
+      "loading": "Verifying...",
+      "loadingDescription": "Please wait while we verify your email",
+      "success": {
+        "title": "Email verified!",
+        "message": "Email verified successfully",
+        "redirecting": "Redirecting to sign in page..."
+      },
+      "error": {
+        "title": "Verification error",
+        "missingToken": "Missing verification token",
+        "verificationError": "Error during verification",
+        "generic": "An error occurred during verification",
+        "invalidOrExpired": "The verification link is invalid or has expired.",
+        "createNewAccount": "Create new account",
+        "signIn": "Sign in"
+      }
+    },
+    "resendVerification": {
+      "title": "Resend verification email",
+      "description": "Enter your email address to receive a new verification link",
+      "emailPlaceholder": "you@example.com",
+      "submit": "Resend verification link",
+      "submitting": "Sending...",
+      "success": {
+        "message": "A new verification link has been sent.",
+        "checkEmail": "Check your inbox (and spam folder if necessary)."
+      },
+      "error": {
+        "generic": "An error occurred",
+        "sendError": "An error occurred while sending the verification link"
+      },
+      "backToSignIn": "Back to sign in",
+      "createNewAccount": "Create new account"
+    }
+  },
+  "dashboard": {
+    "title": "MetamorphUI",
+    "myProjects": "My projects",
+    "description": "Manage your Figma projects and design tokens",
+    "newProject": "New project",
+    "maxProjectsReached": "Limit reached ({max} projects max)",
+    "noProjects": {
+      "title": "No projects",
+      "description": "Create your first project to start importing your Figma tokens",
+      "createButton": "Create project"
+    },
+    "project": {
+      "figmaFile": "Figma file: {fileId}",
+      "tokens": "{count} token",
+      "tokensPlural": "{count} tokens"
+    }
+  }
+}

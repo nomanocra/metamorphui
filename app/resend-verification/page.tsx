@@ -8,9 +8,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react"
+import { useTranslations } from 'next-intl'
 
 export default function ResendVerificationPage() {
   const router = useRouter()
+  const t = useTranslations()
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
@@ -35,14 +37,14 @@ export default function ResendVerificationPage() {
 
       if (response.ok) {
         setStatus("success")
-        setMessage(data.message || "Un nouveau lien de vérification a été envoyé.")
+        setMessage(data.message || t('auth.resendVerification.success.message'))
       } else {
         setStatus("error")
-        setMessage(data.error || "Une erreur est survenue")
+        setMessage(data.error || t('auth.resendVerification.error.generic'))
       }
     } catch (error) {
       setStatus("error")
-      setMessage("Une erreur est survenue lors de l'envoi du lien de vérification")
+      setMessage(t('auth.resendVerification.error.sendError'))
     } finally {
       setIsLoading(false)
     }
@@ -52,9 +54,9 @@ export default function ResendVerificationPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Renvoyer l'email de vérification</CardTitle>
+          <CardTitle>{t('auth.resendVerification.title')}</CardTitle>
           <CardDescription>
-            Entrez votre adresse email pour recevoir un nouveau lien de vérification
+            {t('auth.resendVerification.description')}
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -65,7 +67,7 @@ export default function ResendVerificationPage() {
                 <div>
                   <p className="font-semibold text-green-900 dark:text-green-100">{message}</p>
                   <p className="text-green-800 dark:text-green-200 text-xs mt-1">
-                    Vérifiez votre boîte mail (et le dossier spam si nécessaire).
+                    {t('auth.resendVerification.success.checkEmail')}
                   </p>
                 </div>
               </div>
@@ -79,11 +81,11 @@ export default function ResendVerificationPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('common.email')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="vous@exemple.com"
+                placeholder={t('auth.resendVerification.emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -95,20 +97,20 @@ export default function ResendVerificationPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Envoi en cours...
+                  {t('auth.resendVerification.submitting')}
                 </>
               ) : (
-                "Renvoyer le lien de vérification"
+                t('auth.resendVerification.submit')
               )}
             </Button>
           </CardContent>
         </form>
         <CardFooter className="flex flex-col space-y-2">
           <Link href="/signin" className="text-sm text-muted-foreground hover:text-foreground">
-            Retour à la connexion
+            {t('auth.resendVerification.backToSignIn')}
           </Link>
           <Link href="/signup" className="text-sm text-muted-foreground hover:text-foreground">
-            Créer un nouveau compte
+            {t('auth.resendVerification.createNewAccount')}
           </Link>
         </CardFooter>
       </Card>

@@ -8,21 +8,27 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { LanguageToggle } from '@/components/language-toggle';
+import { LanguageIndicator } from '@/components/language-indicator';
+import { getTranslations } from 'next-intl/server';
 
-export default function Home() {
+export default async function Home() {
+  const t = await getTranslations();
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted">
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">MetamorphUI</h1>
+          <h1 className="text-2xl font-bold">{t('home.title')}</h1>
           <div className="flex items-center gap-4">
+            <LanguageToggle />
+            <LanguageIndicator />
             <ThemeToggle />
             <Link href="/signin">
-              <Button variant="ghost">Se connecter</Button>
+              <Button variant="ghost">{t('home.signIn')}</Button>
             </Link>
             <Link href="/signup">
-              <Button>Créer un compte</Button>
+              <Button>{t('home.createAccount')}</Button>
             </Link>
           </div>
         </div>
@@ -32,20 +38,18 @@ export default function Home() {
       <main className="container mx-auto px-4 py-16">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold mb-4">
-            Transformez vos designs Figma en composants React
+            {t('home.hero.title')}
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Générez automatiquement des tokens de design et des composants React
-            à partir de vos fichiers Figma. Exportez vos tokens en CSS et vos
-            composants prêts pour la production.
+            {t('home.hero.description')}
           </p>
           <div className="flex gap-4 justify-center">
             <Link href="/signup">
-              <Button size="lg">Commencer gratuitement</Button>
+              <Button size="lg">{t('home.hero.startFree')}</Button>
             </Link>
             <Link href="/signin">
               <Button size="lg" variant="outline">
-                Se connecter
+                {t('home.hero.signInButton')}
               </Button>
             </Link>
           </div>
@@ -55,46 +59,42 @@ export default function Home() {
         <div className="grid md:grid-cols-3 gap-6 mt-16">
           <Card>
             <CardHeader>
-              <CardTitle>🎨 Tokens de Design</CardTitle>
+              <CardTitle>{t('home.features.designTokens.title')}</CardTitle>
               <CardDescription>
-                Importez automatiquement tous vos tokens Figma (couleurs,
-                typographie, espacements)
+                {t('home.features.designTokens.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Synchronisez vos variables Figma et exportez-les en CSS custom
-                properties pour une intégration facile.
+                {t('home.features.designTokens.details')}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>⚛️ Composants React</CardTitle>
+              <CardTitle>{t('home.features.reactComponents.title')}</CardTitle>
               <CardDescription>
-                Générez des composants React à partir de vos composants Figma
+                {t('home.features.reactComponents.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Transformez vos designs en composants React réutilisables et
-                prêts pour la production.
+                {t('home.features.reactComponents.details')}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>🔄 Synchronisation</CardTitle>
+              <CardTitle>{t('home.features.synchronization.title')}</CardTitle>
               <CardDescription>
-                Restez à jour avec vos designs Figma en un clic
+                {t('home.features.synchronization.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Synchronisez vos tokens et composants à tout moment pour
-                refléter les dernières modifications de votre équipe design.
+                {t('home.features.synchronization.details')}
               </p>
             </CardContent>
           </Card>
@@ -104,16 +104,15 @@ export default function Home() {
         <div className="mt-16 text-center">
           <Card className="max-w-2xl mx-auto">
             <CardHeader>
-              <CardTitle>Prêt à commencer ?</CardTitle>
+              <CardTitle>{t('home.cta.title')}</CardTitle>
               <CardDescription>
-                Créez votre compte gratuitement et connectez votre premier
-                projet Figma
+                {t('home.cta.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Link href="/signup">
                 <Button size="lg" className="w-full md:w-auto">
-                  Créer un compte gratuit
+                  {t('home.cta.button')}
                 </Button>
               </Link>
             </CardContent>
@@ -124,7 +123,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t mt-16">
         <div className="container mx-auto px-4 py-8 text-center text-sm text-muted-foreground">
-          <p>© 2024 MetamorphUI. Tous droits réservés.</p>
+          <p>{t('common.copyright')}</p>
         </div>
       </footer>
     </div>
