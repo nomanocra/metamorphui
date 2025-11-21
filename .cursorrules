@@ -1,0 +1,225 @@
+# MetamorphUI - Cursor Rules
+
+## 🎯 But de l'application
+
+MetamorphUI est un SaaS qui transforme automatiquement les designs Figma (ouPenpot) en code Token et composants React (ou Vue) prêt pour la production.
+
+### Fonctionnalités principales
+
+- **Import depuis Figma** : Connexion à des fichiers Figma via l'API Figma
+- **Génération de tokens de design** : Extraction automatique des variables Figma (couleurs, typographie, espacements) et export en CSS custom properties
+- **Génération de composants React** : Transformation des composants Figma en composants React réutilisables et prêts pour la production
+- **Synchronisation** : Mise à jour automatique des tokens et composants quand les designs Figma changent
+
+### Public cible
+
+Développeurs et équipes design/dev qui veulent automatiser le passage du design (Figma) au code (React).
+
+## 🏗️ Architecture technique
+
+### Stack
+
+- **Framework** : Next.js 14 (App Router)
+- **Language** : TypeScript
+- **Base de données** : PostgreSQL avec Prisma ORM
+- **Authentification** : NextAuth.js (Credentials, Google OAuth, GitHub OAuth)
+- **Email** : Resend pour l'envoi d'emails de vérification
+- **Styling** : Tailwind CSS + shadcn/ui
+- **Thème** : next-themes pour le mode clair/sombre
+
+### Structure du projet
+
+```
+app/
+  ├── api/              # Routes API (NextAuth, signup, verification, etc.)
+  ├── dashboard/        # Dashboard utilisateur
+  ├── signin/           # Page de connexion
+  ├── signup/           # Page d'inscription
+  ├── verify-email/     # Vérification d'email
+  └── resend-verification/ # Renvoi d'email de vérification
+
+components/
+  ├── auth/             # Composants d'authentification
+  ├── ui/               # Composants shadcn/ui
+  ├── theme-provider.tsx # Provider pour next-themes
+  └── theme-toggle.tsx   # Sélecteur de thème
+
+lib/
+  ├── auth.ts           # Configuration NextAuth
+  ├── prisma.ts         # Client Prisma
+  ├── email.ts          # Service d'envoi d'emails (Resend)
+  └── session.ts        # Utilitaires de session
+
+prisma/
+  └── schema.prisma     # Schéma de base de données
+```
+
+## 📊 Modèle de données
+
+### User
+
+- Informations utilisateur (email, nom, mot de passe hashé)
+- `emailVerified` : Date de vérification de l'email (null si non vérifié)
+- Relations : accounts (OAuth), sessions, projects
+
+### Project
+
+- Projet lié à un fichier Figma
+- Contient `figmaFileId` et `figmaApiKey` (chiffrée)
+- Relation : user, tokens
+
+### Token
+
+- Tokens de design extraits de Figma
+- Types : color, typography, spacing, etc.
+- Contient `figmaVariableId` si disponible
+- Relation : project
+
+### Account
+
+- Comptes OAuth (Google, GitHub)
+- Géré par NextAuth avec PrismaAdapter
+
+### VerificationToken
+
+- Tokens pour la vérification d'email
+- Expire après 24 heures
+
+## 🔐 Authentification
+
+### Flux d'inscription
+
+1. Utilisateur s'inscrit avec email/password
+2. Compte créé avec `emailVerified: null`
+3. Token de vérification généré et stocké
+4. Email de vérification envoyé via Resend
+5. Utilisateur clique sur le lien → email vérifié
+6. Utilisateur peut se connecter
+
+### OAuth (Google/GitHub)
+
+- Les utilisateurs OAuth n'ont pas besoin de vérifier leur email (déjà vérifié par le provider)
+- `emailVerified` est automatiquement rempli par NextAuth
+- Support de la liaison de comptes avec `allowDangerousEmailAccountLinking: true`
+
+### Sécurité
+
+- Les utilisateurs non vérifiés ne peuvent pas se connecter
+- Les tokens de vérification expirent après 24h
+- Possibilité de renvoyer un email de vérification via `/resend-verification`
+
+## 📧 Email
+
+### Configuration
+
+- Service : Resend
+- Domaine vérifié : `davidduprat.fr` (temporaire, en attente de `metamorphui.com`)
+- From : `noreply@davidduprat.fr`
+
+### Emails envoyés
+
+- Email de vérification lors de l'inscription
+- Email de renvoi de vérification si le lien a expiré
+
+## 🎨 UI/UX
+
+### Thème
+
+- Support du mode clair/sombre avec `next-themes`
+- Détection automatique de la préférence système
+- Sélecteur de thème dans le header
+
+### Composants
+
+- Utilisation de shadcn/ui pour les composants de base
+- Tailwind CSS pour le styling
+- Design responsive
+
+## 🔄 Conventions de code
+
+### Naming
+
+- Composants : PascalCase (`SignUpForm.tsx`)
+- Fichiers : kebab-case pour les routes, PascalCase pour les composants
+- Variables : camelCase
+- Types/Interfaces : PascalCase
+
+### Imports
+
+- Imports absolus avec `@/` (configuré dans `tsconfig.json`)
+- Ordre : React → Next.js → librairies externes → composants locaux → styles
+
+### API Routes
+
+- Routes dans `app/api/`
+- Utilisation de `NextResponse` pour les réponses
+- Gestion d'erreurs avec try/catch et codes HTTP appropriés
+
+### Base de données
+
+- Utilisation de Prisma pour toutes les requêtes
+- Transactions pour les opérations multiples
+- Validation des données avant insertion
+
+## 🚀 Déploiement
+
+### Variables d'environnement requises
+
+```env
+# Base de données
+DATABASE_URL="postgresql://..."
+
+# NextAuth
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="..."
+
+# OAuth (optionnel)
+GOOGLE_CLIENT_ID="..."
+GOOGLE_CLIENT_SECRET="..."
+GITHUB_CLIENT_ID="..."
+GITHUB_CLIENT_SECRET="..."
+
+# Email (Resend)
+RESEND_API_KEY="..."
+RESEND_FROM_EMAIL="noreply@davidduprat.fr"
+
+# Encryption (pour les API keys Figma)
+ENCRYPTION_KEY="..."
+```
+
+## 📝 Notes importantes
+
+### À faire
+
+- [ ] Internationalisation (FR/EN) - en attente
+- [ ] Intégration API Figma
+- [ ] Génération de tokens depuis Figma
+- [ ] Génération de composants React depuis Figma
+- [ ] Dashboard pour gérer les projets
+- [ ] Export de tokens en CSS/JSON
+
+### Domaines
+
+- Domaine temporaire : `davidduprat.fr`
+- Domaine prévu : `metamorphui.com` (en attente de création chez Scaleway)
+
+### Sécurité
+
+- Les API keys Figma doivent être chiffrées avant stockage
+- Validation stricte des entrées utilisateur
+- Protection CSRF avec NextAuth
+- Rate limiting à implémenter pour les routes API
+
+## 🐛 Debugging
+
+### Logs
+
+- Les logs OAuth sont activés en mode développement
+- Logs détaillés pour l'envoi d'emails
+- Console.log pour le debugging (à remplacer par un vrai logger en production)
+
+### Erreurs communes
+
+- Erreur "Email not verified" : L'utilisateur doit vérifier son email
+- Erreur "OAuthAccountNotLinked" : Compte OAuth non lié à un compte existant
+- Erreur Resend 403 : Domaine non vérifié ou email non autorisé (mode test)
