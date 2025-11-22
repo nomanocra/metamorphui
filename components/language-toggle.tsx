@@ -19,14 +19,24 @@ export function LanguageToggle() {
   // This respects the priority: DB > cookie > system
   const currentLocale = useLocale() as 'fr' | 'en'
   const [mounted, setMounted] = React.useState(false)
+  // Initialize with currentLocale to match server-rendered value (avoid hydration mismatch)
+  const [localLocale, setLocalLocale] = React.useState<'fr' | 'en'>(currentLocale)
 
   // Avoid hydration mismatch
   React.useEffect(() => {
     setMounted(true)
   }, [])
 
+  // Sync local locale with context locale (e.g., after page reload or login/logout)
+  React.useEffect(() => {
+    setLocalLocale(currentLocale)
+  }, [currentLocale])
+
   const handleLanguageChange = async (newLocale: "fr" | "en") => {
     if (newLocale === currentLocale) return
+
+    // Optimistic update: update local state immediately
+    setLocalLocale(newLocale)
 
     try {
       // Always try to save to API (API will check if user is logged in)
@@ -52,28 +62,35 @@ export function LanguageToggle() {
       // Always save to cookies
       document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
 
-      // Reload page to apply new language
-      // useLocale() will automatically update after reload
-      window.location.reload()
+      // Use router.refresh() instead of window.location.reload() for smoother experience
+      // This will refresh server components without full page reload
+      router.refresh()
     } catch (error) {
       console.error("Error changing language:", error)
+      // Revert optimistic update on error
+      setLocalLocale(currentLocale)
     }
   }
 
   if (!mounted) {
+    // Use localLocale even before mount to show correct value immediately
+    const displayLocale = localLocale.toUpperCase() as 'FR' | 'EN'
     return (
-      <Button variant="outline" size="icon" className="h-9 w-9">
-        <Globe className="h-4 w-4" />
+      <Button variant="outline" className="h-9 min-w-[3rem]">
+        <span className="text-sm font-medium">{displayLocale}</span>
         <span className="sr-only">Toggle language</span>
       </Button>
     )
   }
 
+  // Display local locale (optimistically updated) in uppercase
+  const displayLocale = localLocale.toUpperCase() as 'FR' | 'EN'
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="h-9 w-9">
-          <Globe className="h-4 w-4" />
+        <Button variant="outline" className="h-9 min-w-[3rem]">
+          <span className="text-sm font-medium">{displayLocale}</span>
           <span className="sr-only">Toggle language</span>
         </Button>
       </DropdownMenuTrigger>

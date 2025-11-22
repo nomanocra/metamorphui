@@ -45,16 +45,16 @@ export function ThemeProvider({
   }
 
   // Resolve theme (system -> light/dark)
-  const resolveTheme = (themeValue: Theme): "light" | "dark" => {
+  const resolveTheme = React.useCallback((themeValue: Theme): "light" | "dark" => {
     if (themeValue === "system" && enableSystem) {
       return getSystemTheme()
     }
     return themeValue === "dark" ? "dark" : "light"
-  }
+  }, [enableSystem])
 
   // Apply theme to HTML element
-  const applyTheme = React.useCallback((themeValue: Theme) => {
-    const resolved = resolveTheme(themeValue)
+  const applyTheme = React.useCallback((themeValue: Theme, resolved?: "light" | "dark") => {
+    const resolvedThemeValue = resolved ?? resolveTheme(themeValue)
     const root = document.documentElement
 
     if (disableTransitionOnChange) {
@@ -68,9 +68,9 @@ export function ThemeProvider({
 
       root.classList.remove("light", "dark")
       if (attribute === "class") {
-        root.classList.add(resolved)
+        root.classList.add(resolvedThemeValue)
       } else {
-        root.setAttribute(attribute, resolved)
+        root.setAttribute(attribute, resolvedThemeValue)
       }
 
       // Force a reflow to ensure the transition is removed
@@ -83,14 +83,14 @@ export function ThemeProvider({
     } else {
       root.classList.remove("light", "dark")
       if (attribute === "class") {
-        root.classList.add(resolved)
+        root.classList.add(resolvedThemeValue)
       } else {
-        root.setAttribute(attribute, resolved)
+        root.setAttribute(attribute, resolvedThemeValue)
       }
     }
 
-    setResolvedTheme(resolved)
-  }, [attribute, enableSystem, disableTransitionOnChange])
+    setResolvedTheme(resolvedThemeValue)
+  }, [attribute, enableSystem, disableTransitionOnChange, resolveTheme])
 
   // Initialize theme on mount
   React.useEffect(() => {
@@ -125,9 +125,15 @@ export function ThemeProvider({
   }, [theme, mounted, applyTheme])
 
   const setTheme = React.useCallback((newTheme: Theme) => {
+    // Update resolvedTheme immediately for instant icon update (before state update)
+    const newResolved = resolveTheme(newTheme)
+    setResolvedTheme(newResolved)
+    // Update theme state
     setThemeState(newTheme)
+    // Apply theme to DOM immediately
+    applyTheme(newTheme, newResolved)
     // Cookie is saved by ThemeToggle/ThemeSync
-  }, [])
+  }, [resolveTheme, applyTheme])
 
   const value = React.useMemo(
     () => ({
@@ -135,7 +141,7 @@ export function ThemeProvider({
       resolvedTheme: mounted ? resolvedTheme : resolveTheme(defaultTheme),
       setTheme,
     }),
-    [theme, resolvedTheme, setTheme, mounted, defaultTheme]
+    [theme, resolvedTheme, setTheme, mounted, defaultTheme, resolveTheme]
   )
 
   return (
