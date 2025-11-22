@@ -102,6 +102,28 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           hasId: !!user.id,
         });
+        
+        // Ensure new OAuth users have theme set to 'system' by default
+        // PrismaAdapter creates the user, but we need to update theme if it's null
+        if (user.email) {
+          try {
+            const dbUser = await prisma.user.findUnique({
+              where: { email: user.email },
+              select: { theme: true },
+            });
+            
+            // If user exists but theme is null, set it to 'system'
+            if (dbUser && !dbUser.theme) {
+              await prisma.user.update({
+                where: { email: user.email },
+                data: { theme: 'system' },
+              });
+              console.log(`Set default theme 'system' for OAuth user ${user.email}`);
+            }
+          } catch (error) {
+            console.error('Error setting default theme for OAuth user:', error);
+          }
+        }
       }
       // Allow all sign ins
       return true;

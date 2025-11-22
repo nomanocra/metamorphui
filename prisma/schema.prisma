@@ -18,6 +18,7 @@ model User {
   image         String?
   password      String? // null for OAuth users
   language      String? // User language preference (fr, en)
+  theme         String? // User theme preference (light, dark, system)
   accounts      Account[]
   sessions      Session[]
   projects      Project[]

@@ -61,6 +61,7 @@ export async function POST(request: Request) {
         name: name || null,
         password: hashedPassword,
         emailVerified: null, // Email not verified yet
+        theme: 'system', // Default theme is system
       },
     })
 

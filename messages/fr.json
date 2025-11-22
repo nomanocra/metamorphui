@@ -15,7 +15,12 @@
     "alreadyHaveAccount": "Déjà un compte ?",
     "noAccount": "Pas encore de compte ?",
     "orContinueWith": "Ou continuer avec",
-    "copyright": "© 2024 MetamorphUI. Tous droits réservés."
+    "copyright": "© 2024 MetamorphUI. Tous droits réservés.",
+    "theme": {
+      "light": "Clair",
+      "dark": "Sombre",
+      "system": "Système"
+    }
   },
   "home": {
     "title": "MetamorphUI",
