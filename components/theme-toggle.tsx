@@ -13,34 +13,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-// Helper to get theme from cookie or DOM (client-side only)
-function getThemeFromCookieOrDOM(): "light" | "dark" | "system" {
-  if (typeof window === 'undefined') return 'system'
-  
-  // Try cookie first
-  const cookie = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('NEXT_THEME='))
-    ?.split('=')[1]
-  
-  if (cookie === 'light' || cookie === 'dark' || cookie === 'system') {
-    return cookie
-  }
-  
-  // Fallback to DOM class
-  const htmlClass = document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-  return htmlClass
-}
-
-// Helper to resolve theme to light/dark
-function resolveThemeToLightDark(theme: "light" | "dark" | "system"): "light" | "dark" {
-  if (theme === "system") {
-    if (typeof window === "undefined") return "light"
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
-  }
-  return theme === "dark" ? "dark" : "light"
-}
-
 export function ThemeToggle() {
   const { setTheme, theme, resolvedTheme } = useTheme()
   const t = useTranslations('common.theme')

@@ -61,12 +61,12 @@ export default async function RootLayout({
               (function() {
                 try {
                   const theme = '${determinedTheme}';
-                  const resolvedTheme = '${resolvedTheme}';
                   if (theme === 'system') {
                     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                     document.documentElement.classList.toggle('dark', prefersDark);
                   } else {
-                    document.documentElement.classList.toggle('dark', resolvedTheme === 'dark');
+                    const isDark = theme === 'dark';
+                    document.documentElement.classList.toggle('dark', isDark);
                   }
                 } catch (e) {}
               })();

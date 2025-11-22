@@ -62,21 +62,12 @@ export async function getThemeFromCookie(): Promise<SupportedTheme | null> {
 /**
  * Get system/browser theme preference from prefers-color-scheme header
  * Note: This header is not always available server-side, so we default to 'system'
+ * The actual resolved theme (light/dark) will be determined client-side
  */
 export function getSystemTheme(
   prefersColorSchemeHeader?: string | null
 ): SupportedTheme {
-  if (!prefersColorSchemeHeader) {
-    return DEFAULT_THEME; // Default to 'system' if header not available
-  }
-
-  // Parse prefers-color-scheme header (e.g., "dark", "light", "no-preference")
-  const prefersDark = prefersColorSchemeHeader.toLowerCase().includes('dark');
-  const prefersLight = prefersColorSchemeHeader.toLowerCase().includes('light');
-
-  // If explicit preference, we could return 'light' or 'dark'
-  // But since we support 'system', we return 'system' to let the browser handle it
-  // The actual resolved theme will be determined client-side by next-themes
+  // Always return 'system' to let the browser handle the actual resolution client-side
   return DEFAULT_THEME;
 }
 

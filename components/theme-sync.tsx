@@ -8,9 +8,9 @@ interface ThemeSyncProps {
 }
 
 /**
- * Component that syncs the cookie and localStorage with the determined theme
+ * Component that syncs the cookie with the determined theme
  * This ensures that when a user logs in with a DB preference,
- * the cookie and localStorage are updated to match that preference
+ * the cookie is updated to match that preference
  * 
  * serverTheme is determined server-side with priority: DB > cookie > system
  * When the page reloads after login/logout, serverTheme is recalculated and this component
@@ -34,7 +34,7 @@ export function ThemeSync({ serverTheme }: ThemeSyncProps) {
       document.cookie = `NEXT_THEME=${serverTheme}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
     }
 
-    // Update theme via next-themes (no localStorage, only cookies)
+    // Update theme via context
     // This will update when serverTheme changes (e.g., after page reload following login/logout)
     setTheme(serverTheme)
     // eslint-disable-next-line react-hooks/exhaustive-deps
