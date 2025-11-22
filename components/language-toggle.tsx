@@ -76,8 +76,8 @@ export function LanguageToggle() {
     // Use localLocale even before mount to show correct value immediately
     const displayLocale = localLocale.toUpperCase() as 'FR' | 'EN'
     return (
-      <Button variant="outline" className="h-9 min-w-[3rem]">
-        <span className="text-sm font-medium">{displayLocale}</span>
+      <Button variant="outline" size="icon" className="h-9 w-9">
+        <span className="text-xs font-semibold text-muted-foreground">{displayLocale}</span>
         <span className="sr-only">Toggle language</span>
       </Button>
     )
@@ -89,8 +89,8 @@ export function LanguageToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="h-9 min-w-[3rem]">
-          <span className="text-sm font-medium">{displayLocale}</span>
+        <Button variant="outline" size="icon" className="h-9 w-9">
+          <span className="text-xs font-semibold text-muted-foreground">{displayLocale}</span>
           <span className="sr-only">Toggle language</span>
         </Button>
       </DropdownMenuTrigger>

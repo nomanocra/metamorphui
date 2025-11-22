@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { SignOutButton } from "@/components/auth/signout-button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { LanguageToggle } from "@/components/language-toggle"
-import { LanguageIndicator } from "@/components/language-indicator"
 import { prisma } from "@/lib/prisma"
 import { getTranslations } from 'next-intl/server'
 
@@ -44,7 +43,6 @@ export default async function DashboardPage() {
           <h1 className="text-2xl font-bold">{t('dashboard.title')}</h1>
           <div className="flex items-center gap-4">
             <LanguageToggle />
-            <LanguageIndicator />
             <ThemeToggle />
             <span className="text-sm text-muted-foreground">
               {session.user.email}

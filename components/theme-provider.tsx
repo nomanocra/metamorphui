@@ -6,6 +6,7 @@ import { ThemeProvider as CustomThemeProvider } from "@/lib/theme-context"
 export interface ThemeProviderProps {
   children: React.ReactNode
   defaultTheme?: "light" | "dark" | "system"
+  defaultResolvedTheme?: "light" | "dark"
   attribute?: string
   enableSystem?: boolean
   disableTransitionOnChange?: boolean

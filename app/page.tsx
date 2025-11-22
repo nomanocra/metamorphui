@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageToggle } from '@/components/language-toggle';
-import { LanguageIndicator } from '@/components/language-indicator';
 import { getTranslations } from 'next-intl/server';
 
 export default async function Home() {
@@ -22,7 +21,6 @@ export default async function Home() {
           <h1 className="text-2xl font-bold">{t('home.title')}</h1>
           <div className="flex items-center gap-4">
             <LanguageToggle />
-            <LanguageIndicator />
             <ThemeToggle />
             <Link href="/signin">
               <Button variant="ghost">{t('home.signIn')}</Button>

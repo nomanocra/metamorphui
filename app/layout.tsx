@@ -37,18 +37,43 @@ export default async function RootLayout({
   // Resolve system theme server-side if possible
   // For "system", try to detect from prefers-color-scheme header
   let resolvedThemeClass = '';
+  let resolvedTheme: 'light' | 'dark' | undefined = undefined;
   if (determinedTheme === 'dark') {
     resolvedThemeClass = 'dark';
+    resolvedTheme = 'dark';
   } else if (determinedTheme === 'light') {
     resolvedThemeClass = '';
+    resolvedTheme = 'light';
   } else if (determinedTheme === 'system') {
-    // Try to resolve system theme from header
+    // For system theme, try to detect from header but don't pass resolvedTheme
+    // Let the client detect it to avoid mismatch between server and client detection
     const prefersDark = prefersColorScheme?.toLowerCase().includes('dark');
     resolvedThemeClass = prefersDark ? 'dark' : '';
+    // Don't set resolvedTheme for system - let client detect it
   }
 
   return (
     <html lang={locale} suppressHydrationWarning className={resolvedThemeClass}>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = '${determinedTheme}';
+                  const resolvedTheme = '${resolvedTheme}';
+                  if (theme === 'system') {
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    document.documentElement.classList.toggle('dark', prefersDark);
+                  } else {
+                    document.documentElement.classList.toggle('dark', resolvedTheme === 'dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className={inter.className}>
         <SessionProvider>
           <NextIntlClientProvider messages={messages} locale={locale}>
@@ -56,6 +81,7 @@ export default async function RootLayout({
             <ThemeProvider
               attribute="class"
               defaultTheme={determinedTheme}
+              defaultResolvedTheme={resolvedTheme}
               enableSystem
               disableTransitionOnChange
             >

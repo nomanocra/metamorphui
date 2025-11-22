@@ -42,10 +42,9 @@ function resolveThemeToLightDark(theme: "light" | "dark" | "system"): "light" | 
 }
 
 export function ThemeToggle() {
-  const { setTheme, theme } = useTheme()
+  const { setTheme, theme, resolvedTheme } = useTheme()
   const t = useTranslations('common.theme')
   const [mounted, setMounted] = React.useState(false)
-  // Initialize with theme from context to match server-rendered value (avoid hydration mismatch)
   const [localTheme, setLocalTheme] = React.useState<"light" | "dark" | "system">(theme)
 
   // Avoid hydration mismatch
@@ -57,11 +56,6 @@ export function ThemeToggle() {
   React.useEffect(() => {
     setLocalTheme(theme)
   }, [theme])
-
-  // Resolve theme locally for instant updates (calculated synchronously from theme)
-  const resolvedTheme = React.useMemo((): "light" | "dark" => {
-    return resolveThemeToLightDark(localTheme)
-  }, [localTheme])
 
   const handleThemeChange = async (newTheme: "light" | "dark" | "system") => {
     if (newTheme === theme) return
@@ -100,19 +94,28 @@ export function ThemeToggle() {
     }
   }
 
-  // Calculate resolved theme even before mount to show correct icon immediately
-  const displayResolvedTheme = resolveThemeToLightDark(localTheme)
-  const displayIcon = displayResolvedTheme === "dark" ? (
+  // Determine icon to display: Monitor for system, Sun/Moon based on resolvedTheme
+  // Use localTheme for optimistic updates, but resolvedTheme from context for server consistency
+  const displayIcon = localTheme === "system" ? (
+    <Monitor className="h-4 w-4" />
+  ) : resolvedTheme === "dark" ? (
     <Moon className="h-4 w-4" />
   ) : (
     <Sun className="h-4 w-4" />
   )
 
   if (!mounted) {
-    // Use localTheme even before mount to show correct icon immediately
+    // Use theme and resolvedTheme from context to match server-rendered value (avoid hydration mismatch)
+    const serverIcon = theme === "system" ? (
+      <Monitor className="h-4 w-4" />
+    ) : resolvedTheme === "dark" ? (
+      <Moon className="h-4 w-4" />
+    ) : (
+      <Sun className="h-4 w-4" />
+    )
     return (
       <Button variant="outline" size="icon" className="h-9 w-9">
-        {displayIcon}
+        {serverIcon}
         <span className="sr-only">Toggle theme</span>
       </Button>
     )

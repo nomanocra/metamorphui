@@ -7,6 +7,7 @@ type Theme = "light" | "dark" | "system"
 type ThemeProviderProps = {
   children: React.ReactNode
   defaultTheme?: Theme
+  defaultResolvedTheme?: "light" | "dark"
   attribute?: string
   enableSystem?: boolean
   disableTransitionOnChange?: boolean
@@ -29,13 +30,16 @@ const ThemeProviderContext = React.createContext<ThemeProviderState>(initialStat
 export function ThemeProvider({
   children,
   defaultTheme = "system",
+  defaultResolvedTheme,
   attribute = "class",
   enableSystem = true,
   disableTransitionOnChange = false,
   ...props
 }: ThemeProviderProps) {
   const [theme, setThemeState] = React.useState<Theme>(defaultTheme)
-  const [resolvedTheme, setResolvedTheme] = React.useState<"light" | "dark">("light")
+  // Initialize resolvedTheme from server if provided, otherwise calculate it
+  const initialResolvedTheme = defaultResolvedTheme ?? (defaultTheme === "dark" ? "dark" : "light")
+  const [resolvedTheme, setResolvedTheme] = React.useState<"light" | "dark">(initialResolvedTheme)
   const [mounted, setMounted] = React.useState(false)
 
   // Get system preference
@@ -56,6 +60,14 @@ export function ThemeProvider({
   const applyTheme = React.useCallback((themeValue: Theme, resolved?: "light" | "dark") => {
     const resolvedThemeValue = resolved ?? resolveTheme(themeValue)
     const root = document.documentElement
+
+    // Check if theme is already correctly applied to avoid unnecessary updates
+    const currentClass = root.classList.contains("dark") ? "dark" : "light"
+    if (currentClass === resolvedThemeValue) {
+      // Theme is already correct, just update state
+      setResolvedTheme(resolvedThemeValue)
+      return
+    }
 
     if (disableTransitionOnChange) {
       const css = document.createElement("style")
@@ -99,8 +111,26 @@ export function ThemeProvider({
     // Use defaultTheme from server (already determined with priority: DB > cookie > system)
     // This ensures consistency with server-side rendering
     setThemeState(defaultTheme)
-    applyTheme(defaultTheme)
-  }, [defaultTheme, applyTheme])
+    
+    // For system theme, always check what's actually applied on the DOM (from inline script)
+    // This ensures we respect the client-side detection done by the inline script
+    // For other themes, use defaultResolvedTheme if provided (from server), otherwise resolve it
+    let initialResolved: "light" | "dark"
+    if (defaultTheme === "system") {
+      // Always check what's actually on the DOM (set by inline script)
+      // Don't use defaultResolvedTheme for system to avoid server/client mismatch
+      const isDarkOnDOM = document.documentElement.classList.contains("dark")
+      initialResolved = isDarkOnDOM ? "dark" : "light"
+    } else {
+      // Use defaultResolvedTheme if provided (from server), otherwise resolve it
+      initialResolved = defaultResolvedTheme ?? resolveTheme(defaultTheme)
+    }
+    
+    setResolvedTheme(initialResolved)
+    // Don't call applyTheme if theme is already correctly applied on DOM (to avoid flash)
+    // The inline script has already applied it, and applyTheme checks if it's already correct
+    applyTheme(defaultTheme, initialResolved)
+  }, [defaultTheme, defaultResolvedTheme, applyTheme, resolveTheme])
 
   // Listen to system theme changes
   React.useEffect(() => {
@@ -138,10 +168,10 @@ export function ThemeProvider({
   const value = React.useMemo(
     () => ({
       theme: mounted ? theme : defaultTheme,
-      resolvedTheme: mounted ? resolvedTheme : resolveTheme(defaultTheme),
+      resolvedTheme: mounted ? resolvedTheme : (defaultResolvedTheme ?? resolveTheme(defaultTheme)),
       setTheme,
     }),
-    [theme, resolvedTheme, setTheme, mounted, defaultTheme, resolveTheme]
+    [theme, resolvedTheme, setTheme, mounted, defaultTheme, defaultResolvedTheme, resolveTheme]
   )
 
   return (
