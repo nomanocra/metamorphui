@@ -75,10 +75,8 @@ export async function POST(request: Request) {
     })
 
     // Send verification email
-    console.log("📨 Préparation de l'envoi de l'email de vérification...")
     try {
       await sendVerificationEmail(email, verificationToken, name)
-      console.log("✅ Email de vérification envoyé avec succès")
     } catch (emailError) {
       console.error("❌ Erreur lors de l'envoi de l'email de vérification:", emailError)
       // Don't fail the signup if email fails, but log it

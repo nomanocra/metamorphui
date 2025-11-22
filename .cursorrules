@@ -25,13 +25,15 @@ Développeurs et équipes design/dev qui veulent automatiser le passage du desig
 - **Authentification** : NextAuth.js (Credentials, Google OAuth, GitHub OAuth)
 - **Email** : Resend pour l'envoi d'emails de vérification
 - **Styling** : Tailwind CSS + shadcn/ui
-- **Thème** : next-themes pour le mode clair/sombre
+- **Internationalisation** : next-intl (FR/EN)
+- **Thème** : Système custom (remplace next-themes)
 
 ### Structure du projet
 
 ```
 app/
   ├── api/              # Routes API (NextAuth, signup, verification, etc.)
+  │   └── user/preferences/  # Routes pour préférences utilisateur (language, theme)
   ├── dashboard/        # Dashboard utilisateur
   ├── signin/           # Page de connexion
   ├── signup/           # Page d'inscription
@@ -41,14 +43,29 @@ app/
 components/
   ├── auth/             # Composants d'authentification
   ├── ui/               # Composants shadcn/ui
-  ├── theme-provider.tsx # Provider pour next-themes
-  └── theme-toggle.tsx   # Sélecteur de thème
+  ├── theme-provider.tsx # Provider custom pour le thème
+  ├── theme-toggle.tsx   # Sélecteur de thème
+  ├── theme-sync.tsx     # Synchronisation du thème
+  ├── language-toggle.tsx # Sélecteur de langue
+  ├── language-sync.tsx  # Synchronisation de la langue
+  └── session-provider.tsx # Provider pour NextAuth SessionProvider
 
 lib/
   ├── auth.ts           # Configuration NextAuth
   ├── prisma.ts         # Client Prisma
   ├── email.ts          # Service d'envoi d'emails (Resend)
-  └── session.ts        # Utilitaires de session
+  ├── session.ts        # Utilitaires de session
+  ├── language.ts       # Gestion de la langue (DB > cookie > system)
+  ├── theme.ts          # Gestion du thème (DB > cookie > system)
+  └── theme-context.tsx # Context React pour le thème
+
+i18n/
+  ├── routing.ts        # Configuration next-intl
+i18n.ts                 # Configuration getRequestConfig pour next-intl
+messages/
+  ├── fr.json           # Traductions françaises
+  └── en.json           # Traductions anglaises
+middleware.ts           # Middleware pour détection langue/thème
 
 prisma/
   └── schema.prisma     # Schéma de base de données
@@ -60,6 +77,8 @@ prisma/
 
 - Informations utilisateur (email, nom, mot de passe hashé)
 - `emailVerified` : Date de vérification de l'email (null si non vérifié)
+- `language` : Préférence de langue (fr, en) - nullable
+- `theme` : Préférence de thème (light, dark, system) - nullable
 - Relations : accounts (OAuth), sessions, projects
 
 ### Project
@@ -121,13 +140,44 @@ prisma/
 - Email de vérification lors de l'inscription
 - Email de renvoi de vérification si le lien a expiré
 
+## 🌍 Internationalisation
+
+### Système de langue
+
+- **Bibliothèque** : next-intl
+- **Langues supportées** : Français (fr), Anglais (en)
+- **Priorité de détermination** : Préférence utilisateur (DB) > Cookie > Préférence système
+- **Composants** :
+  - `LanguageToggle` : Sélecteur de langue dans le header (affiche FR/EN)
+  - `LanguageSync` : Synchronisation cookie/DB après connexion/déconnexion
+- **Fichiers de traduction** : `messages/fr.json` et `messages/en.json`
+- **Middleware** : Détection automatique de la langue via `middleware.ts`
+- **API Route** : `/api/user/preferences/language` pour sauvegarder la préférence
+
+### Logique de priorité
+
+1. **Utilisateur connecté** : DB > Cookie > Système (sauvegarde automatique si pas de préférence DB)
+2. **Utilisateur non connecté** : Cookie > Système
+
 ## 🎨 UI/UX
 
 ### Thème
 
-- Support du mode clair/sombre avec `next-themes`
-- Détection automatique de la préférence système
-- Sélecteur de thème dans le header
+- **Système** : Provider custom (remplace next-themes)
+- **Thèmes supportés** : light, dark, system
+- **Priorité de détermination** : Préférence utilisateur (DB) > Cookie > Préférence système
+- **Composants** :
+  - `ThemeProvider` : Provider React custom (`lib/theme-context.tsx`)
+  - `ThemeToggle` : Sélecteur de thème dans le header (icônes Sun/Moon/Monitor)
+  - `ThemeSync` : Synchronisation cookie/DB après connexion/déconnexion
+- **Détection système** : Via `prefers-color-scheme` (header + client-side)
+- **Script inline** : Application immédiate du thème avant hydratation React (évite le flash)
+- **API Route** : `/api/user/preferences/theme` pour sauvegarder la préférence
+
+### Logique de priorité
+
+1. **Utilisateur connecté** : DB > Cookie > Système (sauvegarde automatique si pas de préférence DB)
+2. **Utilisateur non connecté** : Cookie > Système
 
 ### Composants
 
@@ -191,7 +241,7 @@ ENCRYPTION_KEY="..."
 
 ### À faire
 
-- [ ] Internationalisation (FR/EN) - en attente
+- [x] Internationalisation (FR/EN) - ✅ Implémenté
 - [ ] Intégration API Figma
 - [ ] Génération de tokens depuis Figma
 - [ ] Génération de composants React depuis Figma

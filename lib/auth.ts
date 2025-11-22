@@ -95,14 +95,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account, profile }) {
       // PrismaAdapter handles user creation automatically
-      // But we can add logging for debugging
       if (account?.provider === 'github' || account?.provider === 'google') {
-        console.log(`OAuth sign in with ${account.provider}:`, {
-          email: user.email,
-          name: user.name,
-          hasId: !!user.id,
-        });
-        
         // Ensure new OAuth users have theme set to 'system' by default
         // PrismaAdapter creates the user, but we need to update theme if it's null
         if (user.email) {
@@ -118,7 +111,6 @@ export const authOptions: NextAuthOptions = {
                 where: { email: user.email },
                 data: { theme: 'system' },
               });
-              console.log(`Set default theme 'system' for OAuth user ${user.email}`);
             }
           } catch (error) {
             console.error('Error setting default theme for OAuth user:', error);
@@ -135,7 +127,6 @@ export const authOptions: NextAuthOptions = {
         // PrismaAdapter creates the user, but user.id might not be immediately available
         if (user.id) {
           token.id = user.id;
-          console.log(`JWT callback: User ID from user object: ${user.id}`);
         } else if (user.email) {
           // If user.id is not available, fetch it from database using email
           // This can happen with OAuth providers when the adapter creates the user
@@ -147,7 +138,6 @@ export const authOptions: NextAuthOptions = {
             if (!dbUser) {
               // If user doesn't exist yet, wait a bit and try again
               // This can happen if PrismaAdapter hasn't finished creating the user
-              console.log('User not found, waiting for PrismaAdapter to create user...');
               await new Promise(resolve => setTimeout(resolve, 200));
               dbUser = await prisma.user.findUnique({
                 where: { email: user.email },
@@ -156,7 +146,6 @@ export const authOptions: NextAuthOptions = {
             
             if (dbUser) {
               token.id = dbUser.id;
-              console.log(`JWT callback: User ID from database: ${dbUser.id}`);
             } else {
               console.error('JWT callback: User not found in database after retry');
             }

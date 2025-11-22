@@ -51,11 +51,11 @@ export function LanguageToggle() {
         
         if (!response.ok && response.status !== 401) {
           // Only log if it's not a 401 (unauthorized is expected if not logged in)
-          console.error("Error saving to API:", response.status)
+          console.error("Error saving language to API:", response.status)
         }
       } catch (apiError) {
         // If API call fails, continue with cookie save
-        console.error("Error saving to API:", apiError)
+        console.error("Error saving language to API:", apiError)
       }
       
       // Always save to cookies

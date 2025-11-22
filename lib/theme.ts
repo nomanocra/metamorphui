@@ -92,10 +92,6 @@ export async function determineTheme(
 
   if (session?.user?.id) {
     userId = session.user.id;
-    console.log(
-      '[determineTheme] Session found via getServerSession, User ID:',
-      userId
-    );
   } else if (allCookies) {
     // Try to decode token to get user ID as fallback
     try {
@@ -118,51 +114,31 @@ export async function determineTheme(
       });
       if (token?.id) {
         userId = token.id as string;
-        console.log(
-          '[determineTheme] Session found via token, User ID:',
-          userId
-        );
       }
     } catch (error) {
-      console.log(
-        '[determineTheme] Could not decode token (this is normal if not logged in):',
-        error instanceof Error ? error.message : error
-      );
+      // Silent fail - this is normal if user is not logged in
     }
   }
-
-  console.log('[determineTheme] Final User ID:', userId || 'No user');
 
   // If user is logged in
   if (userId) {
     const userTheme = await getUserTheme(userId);
-    console.log(`[determineTheme] User ${userId} theme from DB:`, userTheme);
 
     // Priority 1: User preference in DB (highest priority)
     if (userTheme) {
-      console.log(
-        `[determineTheme] Using user preference from DB: ${userTheme}`
-      );
       return userTheme;
     }
 
     // Priority 2: Cookie (if user has no preference, use cookie and save it)
     const cookieTheme = await getThemeFromCookie();
-    console.log(`[determineTheme] Cookie theme:`, cookieTheme);
 
     if (cookieTheme) {
-      console.log(
-        `[determineTheme] User has no DB preference, using cookie (${cookieTheme}) and saving to DB`
-      );
       // Save cookie preference to user preference in DB
       try {
         await prisma.user.update({
           where: { id: userId },
           data: { theme: cookieTheme },
         });
-        console.log(
-          `[determineTheme] Saved cookie theme (${cookieTheme}) to user ${userId} preference`
-        );
       } catch (error) {
         console.error(
           '[determineTheme] Error saving theme to user preference:',
@@ -180,9 +156,6 @@ export async function determineTheme(
         where: { id: userId },
         data: { theme: systemTheme },
       });
-      console.log(
-        `[determineTheme] Saved system theme (${systemTheme}) to user ${userId} preference`
-      );
     } catch (error) {
       console.error('Error saving system theme to user preference:', error);
     }
@@ -191,17 +164,14 @@ export async function determineTheme(
   }
 
   // User not logged in
-  console.log('[determineTheme] User not logged in, checking cookies');
   const cookieTheme = await getThemeFromCookie();
 
   if (cookieTheme) {
-    console.log(`[determineTheme] Using cookie theme: ${cookieTheme}`);
     return cookieTheme;
   }
 
   // No cookie, detect system theme
   const systemTheme = getSystemTheme(prefersColorSchemeHeader);
-  console.log(`[determineTheme] No cookie, using system theme: ${systemTheme}`);
   return systemTheme;
 }
 
@@ -239,9 +209,6 @@ export async function determineThemeInMiddleware(
           where: { id: token.id as string },
           data: { theme: cookieTheme as SupportedTheme },
         });
-        console.log(
-          `[Middleware] Saved cookie theme (${cookieTheme}) to user ${token.id} preference`
-        );
       } catch (error) {
         console.error('Error saving theme to user preference:', error);
       }
@@ -257,9 +224,6 @@ export async function determineThemeInMiddleware(
         where: { id: token.id as string },
         data: { theme: systemTheme },
       });
-      console.log(
-        `[Middleware] Saved system theme (${systemTheme}) to user ${token.id} preference`
-      );
     } catch (error) {
       console.error('Error saving system theme to user preference:', error);
     }
@@ -301,7 +265,6 @@ export async function saveThemePreference(
         where: { id: userId },
         data: { theme: theme },
       });
-      console.log(`Saved theme preference (${theme}) to user ${userId}`);
     } catch (error) {
       console.error('Error saving theme to user preference:', error);
       throw error; // Re-throw to let API route handle it

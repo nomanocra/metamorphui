@@ -24,9 +24,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { language } = languageSchema.parse(body);
     
-    console.log(`[API] Updating language preference to ${language} for user ${session.user.id}`);
     await saveLanguagePreference(language as SupportedLocale, session.user.id);
-    console.log(`[API] Successfully updated language preference to ${language} for user ${session.user.id}`);
     
     return NextResponse.json({ success: true, language });
   } catch (error) {

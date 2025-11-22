@@ -34,7 +34,6 @@ export async function POST(request: NextRequest) {
     
     // More strict check: ensure session exists, has user, and user has id
     if (!session || !session.user || !session.user.id) {
-      console.log('[API Theme] No valid session found - user not logged in');
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -44,9 +43,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { theme } = themeSchema.parse(body);
     
-    console.log(`[API] Updating theme preference to ${theme} for user ${session.user.id}`);
     await saveThemePreference(theme as SupportedTheme, session.user.id);
-    console.log(`[API] Successfully updated theme preference to ${theme} for user ${session.user.id}`);
     
     return NextResponse.json({ success: true, theme });
   } catch (error) {

@@ -14,13 +14,7 @@ export async function sendVerificationEmail(
   const apiKey = process.env.RESEND_API_KEY
   const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev"
   
-  console.log("🔍 Vérification de la configuration Resend...")
-  console.log(`   - RESEND_API_KEY présent: ${!!apiKey}`)
-  console.log(`   - RESEND_API_KEY longueur: ${apiKey?.length || 0}`)
-  console.log(`   - RESEND_FROM_EMAIL: ${fromEmail}`)
-  console.log(`   - resend instance: ${!!resend}`)
-  
-  // If Resend is not configured, log the verification URL instead
+  // If Resend is not configured, log the verification URL instead (dev mode)
   if (!resend || !apiKey) {
     const verifyUrl = `${process.env.NEXTAUTH_URL}/verify-email?token=${token}`
     console.log("=".repeat(80))
@@ -36,11 +30,6 @@ export async function sendVerificationEmail(
   }
 
   const verifyUrl = `${process.env.NEXTAUTH_URL}/verify-email?token=${token}`
-
-  console.log("📧 Tentative d'envoi d'email de vérification...")
-  console.log(`   - À: ${email}`)
-  console.log(`   - Depuis: ${fromEmail}`)
-  console.log(`   - URL de vérification: ${verifyUrl}`)
 
   try {
     const result = await resend.emails.send({
@@ -88,12 +77,6 @@ export async function sendVerificationEmail(
         throw new Error(result.error.message)
       }
       throw new Error(result.error.message)
-    }
-    
-    console.log("✅ Email envoyé avec succès!")
-    console.log(`   - ID: ${result.data?.id || 'N/A'}`)
-    if (result.data) {
-      console.log(`   - Résultat:`, result.data)
     }
   } catch (error) {
     console.error("❌ Erreur lors de l'envoi de l'email:", error)

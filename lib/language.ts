@@ -92,7 +92,6 @@ export async function determineLanguage(
   
   if (session?.user?.id) {
     userId = session.user.id;
-    console.log('[determineLanguage] Session found via getServerSession, User ID:', userId);
   } else if (allCookies) {
     // Try to decode token to get user ID as fallback
     try {
@@ -115,40 +114,32 @@ export async function determineLanguage(
       });
       if (token?.id) {
         userId = token.id as string;
-        console.log('[determineLanguage] Session found via token, User ID:', userId);
       }
     } catch (error) {
-      console.log('[determineLanguage] Could not decode token (this is normal if not logged in):', error instanceof Error ? error.message : error);
+      // Silent fail - this is normal if user is not logged in
     }
   }
-  
-  console.log('[determineLanguage] Final User ID:', userId || 'No user');
   
   // If user is logged in
   if (userId) {
     const userLanguage = await getUserLanguage(userId);
-    console.log(`[determineLanguage] User ${userId} language from DB:`, userLanguage);
     
     // Priority 1: User preference in DB (highest priority)
     if (userLanguage) {
-      console.log(`[determineLanguage] Using user preference from DB: ${userLanguage}`);
       // Note: Cookie sync will be handled by middleware or i18n.ts
       return userLanguage;
     }
     
     // Priority 2: Cookie (if user has no preference, use cookie and save it)
     const cookieLanguage = await getLanguageFromCookies();
-    console.log(`[determineLanguage] Cookie language:`, cookieLanguage);
     
     if (cookieLanguage) {
-      console.log(`[determineLanguage] User has no DB preference, using cookie (${cookieLanguage}) and saving to DB`);
       // Save cookie preference to user preference in DB
       try {
         await prisma.user.update({
           where: { id: userId },
           data: { language: cookieLanguage },
         });
-        console.log(`[determineLanguage] Saved cookie language (${cookieLanguage}) to user ${userId} preference`);
       } catch (error) {
         console.error('[determineLanguage] Error saving language to user preference:', error);
       }
@@ -164,7 +155,6 @@ export async function determineLanguage(
         data: { language: systemLanguage },
       });
       // Note: Cookie will be set by middleware or i18n.ts
-      console.log(`[determineLanguage] Saved system language (${systemLanguage}) to user ${userId} preference`);
     } catch (error) {
       console.error('Error saving system language to user preference:', error);
     }
@@ -173,17 +163,14 @@ export async function determineLanguage(
   }
   
   // User not logged in
-  console.log('[determineLanguage] User not logged in, checking cookies');
   const cookieLanguage = await getLanguageFromCookies();
   
   if (cookieLanguage) {
-    console.log(`[determineLanguage] Using cookie language: ${cookieLanguage}`);
     return cookieLanguage;
   }
   
   // No cookie, detect system language
   const systemLanguage = getSystemLanguage(acceptLanguageHeader);
-  console.log(`[determineLanguage] No cookie, using system language: ${systemLanguage}`);
   return systemLanguage;
 }
 
@@ -218,7 +205,6 @@ export async function determineLanguageInMiddleware(
           where: { id: token.id as string },
           data: { language: cookieLocale as SupportedLocale },
         });
-        console.log(`[Middleware] Saved cookie language (${cookieLocale}) to user ${token.id} preference`);
       } catch (error) {
         console.error('Error saving language to user preference:', error);
       }
@@ -234,7 +220,6 @@ export async function determineLanguageInMiddleware(
         where: { id: token.id as string },
         data: { language: systemLanguage },
       });
-      console.log(`[Middleware] Saved system language (${systemLanguage}) to user ${token.id} preference`);
     } catch (error) {
       console.error('Error saving system language to user preference:', error);
     }
@@ -276,7 +261,6 @@ export async function saveLanguagePreference(
         where: { id: userId },
         data: { language: locale },
       });
-      console.log(`Saved language preference (${locale}) to user ${userId}`);
     } catch (error) {
       console.error('Error saving language to user preference:', error);
       throw error; // Re-throw to let API route handle it

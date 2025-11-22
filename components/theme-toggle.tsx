@@ -52,17 +52,13 @@ export function ThemeToggle() {
         body: JSON.stringify({ theme: newTheme }),
       })
       
-      if (!response.ok) {
-        if (response.status === 401) {
-          // User not logged in - this is expected, just log it
-          console.log('[ThemeToggle] User not logged in, theme saved to cookie only');
-        } else {
-          console.error("Error saving to API:", response.status, await response.text().catch(() => ''))
-        }
+      if (!response.ok && response.status !== 401) {
+        // Only log if it's not a 401 (unauthorized is expected if not logged in)
+        console.error("Error saving theme to API:", response.status)
       }
     } catch (apiError) {
       // If API call fails, continue anyway (theme already changed)
-      console.error("Error saving to API:", apiError)
+      console.error("Error saving theme to API:", apiError)
     }
   }
 
