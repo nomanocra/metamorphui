@@ -76,19 +76,19 @@ export default async function RootLayout({
       </head>
       <body className={inter.className}>
         <SessionProvider>
-          <NextIntlClientProvider messages={messages} locale={locale}>
-            <LanguageSync />
-            <ThemeProvider
-              attribute="class"
+        <NextIntlClientProvider messages={messages} locale={locale}>
+          <LanguageSync />
+          <ThemeProvider
+            attribute="class"
               defaultTheme={determinedTheme}
               defaultResolvedTheme={resolvedTheme}
-              enableSystem
-              disableTransitionOnChange
-            >
+            enableSystem
+            disableTransitionOnChange
+          >
               <ThemeSync serverTheme={determinedTheme} />
-              {children}
-            </ThemeProvider>
-          </NextIntlClientProvider>
+            {children}
+          </ThemeProvider>
+        </NextIntlClientProvider>
         </SessionProvider>
       </body>
     </html>

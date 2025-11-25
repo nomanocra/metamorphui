@@ -110,7 +110,7 @@ export const authOptions: NextAuthOptions = {
               await prisma.user.update({
                 where: { email: user.email },
                 data: { theme: 'system' },
-              });
+        });
             }
           } catch (error) {
             console.error('Error setting default theme for OAuth user:', error);
