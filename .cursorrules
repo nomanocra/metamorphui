@@ -27,6 +27,7 @@ Développeurs et équipes design/dev qui veulent automatiser le passage du desig
 - **Styling** : Tailwind CSS + shadcn/ui
 - **Internationalisation** : next-intl (FR/EN)
 - **Thème** : Système custom (remplace next-themes)
+- **Tests** : Vitest + Testing Library
 
 ### Structure du projet
 
@@ -69,6 +70,20 @@ middleware.ts           # Middleware pour détection langue/thème
 
 prisma/
   └── schema.prisma     # Schéma de base de données
+
+__tests__/              # Tests unitaires et d'intégration
+  ├── api/              # Tests des routes API
+  │   └── auth/
+  │       ├── signup.test.ts
+  │       └── verify-email.test.ts
+  ├── lib/              # Tests de la logique métier
+  │   ├── theme.test.ts
+  │   └── language.test.ts
+  └── components/       # Tests des composants (à venir)
+
+vitest.config.ts        # Configuration Vitest
+vitest.setup.ts         # Setup global des tests
+.husky/pre-commit       # Hook Git pour lancer les tests avant commit
 ```
 
 ## 📊 Modèle de données
@@ -211,6 +226,163 @@ prisma/
 - Transactions pour les opérations multiples
 - Validation des données avant insertion
 
+## 🧪 Tests
+
+### Framework et configuration
+
+- **Framework** : Vitest (remplace Jest, plus rapide et compatible avec Next.js 14)
+- **Configuration** : `vitest.config.ts` et `vitest.setup.ts`
+- **Environnement** : jsdom pour les tests de composants React
+- **Alias** : Support des imports `@/` comme dans le projet
+
+### Structure des tests
+
+```
+__tests__/
+  ├── api/              # Tests des routes API
+  │   └── auth/
+  │       ├── signup.test.ts
+  │       └── verify-email.test.ts
+  ├── lib/              # Tests de la logique métier
+  │   ├── theme.test.ts
+  │   └── language.test.ts
+  └── components/       # Tests des composants (à venir)
+
+vitest.config.ts        # Configuration Vitest
+vitest.setup.ts         # Setup global des tests
+.husky/pre-commit       # Hook Git pour lancer les tests avant commit
+```
+
+### Conventions de nommage
+
+- Fichiers de test : `*.test.ts` ou `*.spec.ts`
+- Un fichier de test par fichier source
+- Nom du fichier : `[nom-du-fichier-source].test.ts`
+
+### Quand écrire des tests
+
+**Priorité haute (obligatoire) :**
+
+- Logique métier critique (`lib/theme.ts`, `lib/language.ts`)
+- Routes API (`app/api/**/route.ts`)
+- Fonctions utilitaires complexes
+
+**Priorité moyenne (recommandé) :**
+
+- Composants avec logique complexe
+- Hooks personnalisés
+- Middleware
+
+**Priorité basse (optionnel) :**
+
+- Composants UI simples (shadcn/ui)
+- Pages statiques
+
+### Comment écrire des tests
+
+**Structure d'un test :**
+
+```typescript
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// Mock des dépendances externes
+vi.mock('@/lib/prisma', () => ({
+  prisma: { user: { findUnique: vi.fn() } },
+}));
+
+describe('nomDeLaFonction', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.resetAllMocks();
+  });
+
+  it('should do something when condition', async () => {
+    // Arrange : préparer les données
+    // Act : exécuter la fonction
+    // Assert : vérifier le résultat
+  });
+});
+```
+
+**Bonnes pratiques :**
+
+- Un test = un comportement spécifique
+- Nommer les tests de manière descriptive : `should [action] when [condition]`
+- Utiliser `beforeEach` pour nettoyer les mocks entre les tests
+- Mocker toutes les dépendances externes (Prisma, NextAuth, etc.)
+- Tester les cas d'erreur ET les cas de succès
+- Tester les cas limites (valeurs null, undefined, etc.)
+
+**Mocks à utiliser :**
+
+- `vi.mock()` pour mocker les modules
+- `vi.fn()` pour créer des fonctions mockées
+- `vi.mocked()` pour typer les mocks
+- `mockResolvedValue()` / `mockRejectedValue()` pour les promesses
+
+### Pre-commit hook
+
+- **Configuration** : Husky avec hook pre-commit
+- **Comportement** : Les tests se lancent automatiquement avant chaque `git commit`
+- **Si les tests échouent** : Le commit est bloqué
+- **Contournement** : `git commit --no-verify` (à utiliser avec précaution)
+
+**Workflow recommandé :**
+
+1. Développer une fonctionnalité
+2. Écrire/modifier les tests correspondants
+3. Lancer `npm run test:watch` pour développement
+4. Commit (les tests se lancent automatiquement)
+5. Si les tests passent → commit créé
+6. Si les tests échouent → corriger avant de commit
+
+### Commandes disponibles
+
+```bash
+npm test              # Lance tous les tests une fois
+npm run test:watch    # Mode watch (relance automatique)
+npm run test:ui       # Interface graphique Vitest
+npm run test:coverage # Rapport de couverture de code
+```
+
+### Couverture actuelle
+
+- ✅ Routes API : `/api/auth/signup`, `/api/auth/verify-email`
+- ✅ Logique métier : `lib/theme.ts`, `lib/language.ts`
+- ⏳ Composants UI : À venir
+- ⏳ Middleware : À venir
+
+**Total actuel : 38 tests passent**
+
+### Exemples de tests
+
+**Test d'une route API :**
+
+```typescript
+it('should create a new user successfully', async () => {
+  vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
+  vi.mocked(prisma.user.create).mockResolvedValue(mockUser);
+
+  const response = await POST(request);
+  const data = await response.json();
+
+  expect(response.status).toBe(201);
+  expect(data.requiresVerification).toBe(true);
+});
+```
+
+**Test d'une fonction utilitaire :**
+
+```typescript
+it('should return user theme from database', async () => {
+  vi.mocked(prisma.user.findUnique).mockResolvedValue({ theme: 'dark' });
+
+  const theme = await getUserTheme('user-123');
+
+  expect(theme).toBe('dark');
+});
+```
+
 ## 🚀 Déploiement
 
 ### Variables d'environnement requises
@@ -242,6 +414,8 @@ ENCRYPTION_KEY="..."
 ### À faire
 
 - [x] Internationalisation (FR/EN) - ✅ Implémenté
+- [x] Tests unitaires et d'intégration - ✅ Implémenté (Vitest, 38 tests)
+- [ ] Tests des composants UI
 - [ ] Intégration API Figma
 - [ ] Génération de tokens depuis Figma
 - [ ] Génération de composants React depuis Figma
@@ -267,6 +441,7 @@ ENCRYPTION_KEY="..."
 - Les logs OAuth sont activés en mode développement
 - Logs détaillés pour l'envoi d'emails
 - Console.log pour le debugging (à remplacer par un vrai logger en production)
+- **Note** : Les logs de debug verbeux ont été supprimés, seuls les `console.error` et logs utiles sont conservés
 
 ### Erreurs communes
 
